@@ -2,7 +2,7 @@
 
 const char* APSSID = "HomeLightAP";
 const char* APPASSWORD = "HLPASS123!";
-const char* mqttServer = "192.168.178.60";
+const char* mqttServer = "192.168.178.119";
 const char* apiUrl = "http://192.168.178.60:3000";
 const int mqttPort = 1883;
 unsigned long lastMsg = 0;
@@ -20,8 +20,8 @@ HTTPClient httpClient;
 
 void setSubscriptions() {
     String all_topic = "all/#";
-    String device_topic = "device/" + (String)EEPROM.read(getDeviceIdAddress()) + "/#";
-    String group_topic = "group/" + (String)EEPROM.read(getGroupNumberAddress()) + "/#";
+    String device_topic = "device/" + EEPROM.readString(getDeviceIdAddress()) + "/#";
+    String group_topic = "group/" + (String)EEPROM.read(getGroupIdAddress()) + "/#";
 
     mqttClient.subscribe(all_topic.c_str());
     mqttClient.subscribe(device_topic.c_str());

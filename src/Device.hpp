@@ -4,16 +4,16 @@
 
 extern const int deviceIdAddress;
 extern const int powerStateAddress;
-extern const int groupNumberAddress;
+extern const int groupIdAddress;
 extern const int deviceNameAddress;
 
-int getDeviceId();
+String getDeviceId();
 String getDeviceName();
-int getGroupNr();
+String getGroupId();
 
-void setDeviceId(int id);
+void setDeviceId(String id);
 void setDeviceName(String deviceName);
-void setGroup(int groupNr);
+void setGroup(String groupId);
 void softResetDevice();
 void hardResetDevice();
 void restartDevice();

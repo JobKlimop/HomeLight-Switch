@@ -3,7 +3,7 @@
 
 int getDeviceIdAddress();
 int getPowerStateAddress();
-int getGroupNumberAddress();
+int getGroupIdAddress();
 int getDeviceNameAddress();
 int getSsidAddress();
 int getPasswordAddress();

@@ -7,7 +7,7 @@
 #include <Light.hpp>
 
 #ifndef EEPROM_SIZE
-#define EEPROM_SIZE 64
+#define EEPROM_SIZE 128
 #endif
 
 boolean messageAlreadySent = false;
@@ -20,7 +20,7 @@ void handleNewSettings() {
       String deviceJson = "{\"deviceId\":" + (String)getDeviceId() + 
                           ",\"deviceIp\":\"" + WiFi.localIP().toString() + "\"" +
                           ",\"deviceName\":\"" + (String)getDeviceName() + "\"" +
-                          ",\"groupNumber\":" + (String)getGroupNr() +
+                          ",\"groupId\":" + (String)getGroupId() +
                           ",\"powerState\":" + (String)getPowerState() +
                           "}";
                           
@@ -37,14 +37,14 @@ void handleNewSettings() {
   //Device topics
   if(mqtt_topic == "device/" + (String)getDeviceId() + "/di") {
     Serial.print("New device ID: ");
-    Serial.println(mqtt_message.toInt());
-    setDeviceId(mqtt_message.toInt());
+    // Serial.println(mqtt_message.toInt());
+    setDeviceId(mqtt_message);
   }
   if(mqtt_topic == "device/" + (String)getDeviceId() + "/dn") {
     setDeviceName(mqtt_message);
   }
   if(mqtt_topic == "device/" + (String)getDeviceId() + "/gn") {
-    setGroup(mqtt_message.toInt());
+    setGroup(mqtt_message);
   }
   if(mqtt_topic == "device/" + (String)getDeviceId() + "/ps") {
     setPowerState(mqtt_message.toInt());
@@ -67,7 +67,7 @@ void handleNewSettings() {
   }
 
   //Group topics
-  if(mqtt_topic == "group/" + (String)getGroupNr() + "/ps") {
+  if(mqtt_topic == "group/" + (String)getGroupId() + "/ps") {
     setPowerState(mqtt_message.toInt());
   }
 
@@ -136,7 +136,7 @@ void loop() {
         String deviceJson = "{\"deviceId\":" + (String)getDeviceId() + 
                             ",\"deviceIp\":\"" + WiFi.localIP() + "\"" +
                             ",\"deviceName\":\"" + (String)getDeviceName() + "\"" +
-                            ",\"groupNumber\":" + (String)getGroupNr() +
+                            ",\"groupId\":" + (String)getGroupId() +
                             ",\"powerState\":" + (String)getPowerState() +
                             "}";
 

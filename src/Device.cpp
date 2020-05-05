@@ -2,20 +2,20 @@
 
 
 
-int getDeviceId() {
-    return EEPROM.read(getDeviceIdAddress());
+String getDeviceId() {
+    return EEPROM.readString(getDeviceIdAddress());
 }
 
 String getDeviceName() {
     return EEPROM.readString(getDeviceNameAddress());
 }
 
-int getGroupNr() {
-    return EEPROM.read(getGroupNumberAddress());
+String getGroupId() {
+    return EEPROM.readString(getGroupIdAddress());
 }
 
-void setDeviceId(int id) {
-    EEPROM.write(getDeviceIdAddress(), id);
+void setDeviceId(String id) {
+    EEPROM.writeString(getDeviceIdAddress(), id);
     EEPROM.commit();
 }
 
@@ -24,14 +24,14 @@ void setDeviceName(String deviceName) {
     EEPROM.commit();
 }
 
-void setGroup(int groupNr) {
-    EEPROM.write(getGroupNumberAddress(), groupNr);
+void setGroup(String groupId) {
+    EEPROM.writeString(getGroupIdAddress(), groupId);
     EEPROM.commit();
 }
 
 void softResetDevice() {
     setDeviceName("");
-    setGroup(0);
+    setGroup("0");
     EEPROM.write(getPowerStateAddress(), LOW);
 
     ESP.restart();
@@ -40,9 +40,9 @@ void softResetDevice() {
 void hardResetDevice() {
     int i = 13;
     int j = 42;
-    setDeviceId(0);
+    setDeviceId("0");
     setDeviceName("");
-    setGroup(0);
+    setGroup("0");
     EEPROM.write(getPowerStateAddress(), LOW);
     while(EEPROM.read(i) != 0x00) {
         EEPROM.write(i, 0x00);
