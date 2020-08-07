@@ -13,70 +13,103 @@
 boolean messageAlreadySent = false;
 long messageTimer = 0;
 
-void handleNewSettings() {
+void handleNewSettings()
+{
   //All topics
-  if(mqtt_topic == "all/") {
-    if(mqtt_message == "sdi"){
-      String deviceJson = "{\"deviceId\":" + (String)getDeviceId() + 
+  if (mqtt_topic == "all/")
+  {
+    if (mqtt_message == "search_device")
+    {
+      String deviceJson = "{\"deviceId\":" + (String)getDeviceId() +
                           ",\"deviceIp\":\"" + WiFi.localIP().toString() + "\"" +
                           ",\"deviceName\":\"" + (String)getDeviceName() + "\"" +
                           ",\"groupId\":" + (String)getGroupId() +
                           ",\"powerState\":" + (String)getPowerState() +
                           "}";
-                          
+
       boolean messageReceived = sendData("/addNewDevice", deviceJson);
 
-      if(messageReceived == true) {
+      if (messageReceived == true)
+      {
         Serial.println("Message received");
-      } else {
+      }
+      else
+      {
         Serial.println("Error");
       }
     }
   }
 
   //Device topics
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/set_device_id") {
+  //Set the device ID
+  if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_device_id")
+  {
     Serial.print("New device ID: ");
     // Serial.println(mqtt_message.toInt());
     setDeviceId(mqtt_message);
   }
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/set_device_name") {
+
+  //Set name of the device
+  if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_device_name")
+  {
     setDeviceName(mqtt_message);
   }
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/set_group_number") {
+
+  //Set group number the device is in
+  if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_group_number")
+  {
     setGroup(mqtt_message);
   }
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/set_power_state") {
+
+  //Set the device power state
+  if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_power_state")
+  {
     setPowerState(mqtt_message.toInt());
   }
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/reset_device") {
-    if(mqtt_message == "true") {
+
+  //Soft reset the device
+  if (mqtt_topic == "device/" + (String)getDeviceId() + "/reset_device")
+  {
+    if (mqtt_message == "true")
+    {
       softResetDevice();
     }
   }
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/hard_reset_device") {
-    if(mqtt_message == "true") {
+
+  //Hard reset the device, which will delete all stored data
+  if (mqtt_topic == "device/" + (String)getDeviceId() + "/hard_reset_device")
+  {
+    if (mqtt_message == "true")
+    {
       hardResetDevice();
     }
   }
 
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/restart_device") {
-    if(mqtt_message == "true") {
+  //Restart the device
+  if (mqtt_topic == "device/" + (String)getDeviceId() + "/restart_device")
+  {
+    if (mqtt_message == "true")
+    {
       restartDevice();
     }
   }
 
   //Group topics
-  if(mqtt_topic == "group/" + (String)getGroupId() + "/set_power_state") {
+  //Sets powerstate for all devices within group
+  if (mqtt_topic == "group/" + (String)getGroupId() + "/set_power_state")
+  {
     setPowerState(mqtt_message.toInt());
   }
 
   new_message = false;
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-  while(!Serial) {}
+  while (!Serial)
+  {
+  }
 
   EEPROM.begin(EEPROM_SIZE);
 
@@ -89,81 +122,102 @@ void setup() {
   Serial.print("DeviceID: ");
   Serial.println(getDeviceId());
 
-  server.on("/controller/setNetworkCredentials", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
-  [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
-    size_t jsonCapacity = JSON_OBJECT_SIZE(2) + 40;
-    DynamicJsonDocument doc = parseData(request, data, jsonCapacity, "/setNetworkCredentials");
+  server.on(
+      "/controller/setNetworkCredentials", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
+      [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+        size_t jsonCapacity = JSON_OBJECT_SIZE(2) + 40;
+        DynamicJsonDocument doc = parseData(request, data, jsonCapacity, "/setNetworkCredentials");
 
-    String ssidString = doc["SSID"];
-    String passwordString = doc["PASSWORD"];
+        String ssidString = doc["SSID"];
+        String passwordString = doc["PASSWORD"];
 
-    EEPROM.writeString(getSsidAddress(), ssidString);
-    EEPROM.writeString(getPasswordAddress(), passwordString);
-    EEPROM.commit();
+        EEPROM.writeString(getSsidAddress(), ssidString);
+        EEPROM.writeString(getPasswordAddress(), passwordString);
+        EEPROM.commit();
 
-    delay(10000);
-    ESP.restart();
-  });
+        delay(10000);
+        ESP.restart();
+      });
 
   server.begin();
 }
 
-void loop() {
+void loop()
+{
   int pressMode = checkButtonPress();
-  if(pressMode == 1) {
+  if (pressMode == 1)
+  {
     restartDevice();
-  } else if(pressMode == 2) {
+  }
+  else if (pressMode == 2)
+  {
     Serial.println("{\"deviceId\":\"" + (String)getDeviceId() + "\"}");
     boolean messageReceived = sendData("/deleteDevice", "{\"deviceId\":\"" + (String)getDeviceId() + "\"}");
-    
-    if(messageReceived == true) {
+
+    if (messageReceived == true)
+    {
       Serial.println("Message received");
       delay(500);
       hardResetDevice();
-    } else {
+    }
+    else
+    {
       Serial.println("Error");
     }
   }
 
-  if(WiFi.status() == WL_CONNECTED) {
-    if(!mqttClient.connected()) {
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    if (!mqttClient.connected())
+    {
       setLedMode("BLINK");
       reconnectMqtt();
-    } else {
+    }
+    else
+    {
       setLedMode("OFF");
-      if (getDeviceId() == 0) {
-        if(messageAlreadySent == false){
-        String deviceJson = "{\"deviceId\":" + (String)getDeviceId() + 
-                            ",\"deviceIp\":\"" + WiFi.localIP() + "\"" +
-                            ",\"deviceName\":\"" + (String)getDeviceName() + "\"" +
-                            ",\"groupId\":" + (String)getGroupId() +
-                            ",\"powerState\":" + (String)getPowerState() +
-                            "}";
+      if (getDeviceId() == 0)
+      {
+        if (messageAlreadySent == false)
+        {
+          String deviceJson = "{\"deviceId\":" + (String)getDeviceId() +
+                              ",\"deviceIp\":\"" + WiFi.localIP() + "\"" +
+                              ",\"deviceName\":\"" + (String)getDeviceName() + "\"" +
+                              ",\"groupId\":" + (String)getGroupId() +
+                              ",\"powerState\":" + (String)getPowerState() +
+                              "}";
 
-        boolean messageReceived = sendData("/addNewDevice", deviceJson);
+          boolean messageReceived = sendData("/addNewDevice", deviceJson);
 
-        if(messageReceived == true) {
-          Serial.println("Message received");
-        } else {
-          Serial.println("Error");
+          if (messageReceived == true)
+          {
+            Serial.println("Message received");
+          }
+          else
+          {
+            Serial.println("Error");
+          }
+
+          messageTimer = millis();
+          messageAlreadySent = true;
         }
-        
-        messageTimer = millis();
-        messageAlreadySent = true;
-        }
 
-        if(millis() - messageTimer > 5000 && messageAlreadySent == true) {
+        if (millis() - messageTimer > 5000 && messageAlreadySent == true)
+        {
           messageAlreadySent = false;
         }
       }
     }
 
-    if(new_message == true) {
+    if (new_message == true)
+    {
       handleNewSettings();
     }
 
     mqttClient.loop();
-  } else {
+  }
+  else
+  {
     setLedMode("BLINK");
     initConnection();
   }
