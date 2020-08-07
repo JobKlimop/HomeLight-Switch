@@ -35,39 +35,39 @@ void handleNewSettings() {
   }
 
   //Device topics
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/di") {
+  if(mqtt_topic == "device/" + (String)getDeviceId() + "/set_device_id") {
     Serial.print("New device ID: ");
     // Serial.println(mqtt_message.toInt());
     setDeviceId(mqtt_message);
   }
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/dn") {
+  if(mqtt_topic == "device/" + (String)getDeviceId() + "/set_device_name") {
     setDeviceName(mqtt_message);
   }
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/gn") {
+  if(mqtt_topic == "device/" + (String)getDeviceId() + "/set_group_number") {
     setGroup(mqtt_message);
   }
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/ps") {
+  if(mqtt_topic == "device/" + (String)getDeviceId() + "/set_power_state") {
     setPowerState(mqtt_message.toInt());
   }
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/rd") {
+  if(mqtt_topic == "device/" + (String)getDeviceId() + "/reset_device") {
     if(mqtt_message == "true") {
       softResetDevice();
     }
   }
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/hrd") {
+  if(mqtt_topic == "device/" + (String)getDeviceId() + "/hard_reset_device") {
     if(mqtt_message == "true") {
       hardResetDevice();
     }
   }
 
-  if(mqtt_topic == "device/" + (String)getDeviceId() + "/res") {
+  if(mqtt_topic == "device/" + (String)getDeviceId() + "/restart_device") {
     if(mqtt_message == "true") {
       restartDevice();
     }
   }
 
   //Group topics
-  if(mqtt_topic == "group/" + (String)getGroupId() + "/ps") {
+  if(mqtt_topic == "group/" + (String)getGroupId() + "/set_power_state") {
     setPowerState(mqtt_message.toInt());
   }
 

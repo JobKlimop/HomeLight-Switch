@@ -1,7 +1,5 @@
 #include <Device.hpp>
 
-
-
 String getDeviceId() {
     return EEPROM.readString(getDeviceIdAddress());
 }

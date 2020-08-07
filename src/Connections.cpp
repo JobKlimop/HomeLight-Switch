@@ -3,7 +3,7 @@
 const char* APSSID = "HomeLightAP";
 const char* APPASSWORD = "HLPASS123!";
 const char* mqttServer = "192.168.178.119";
-const char* apiUrl = "http://192.168.178.60:3000";
+const char* apiUrl = "http://192.168.178.119:3000";
 const int mqttPort = 1883;
 unsigned long lastMsg = 0;
 String mqtt_topic = "";
