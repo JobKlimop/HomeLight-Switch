@@ -6,4 +6,4 @@ extern int powerState;
 
 void initPowerState();
 int getPowerState();
-void setPowerState(int state);
+bool setPowerState(int state);

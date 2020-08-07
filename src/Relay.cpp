@@ -26,8 +26,9 @@ int getPowerState() {
     return EEPROM.read(getPowerStateAddress());
 }
 
-void setPowerState(int state) {
+bool setPowerState(int state) {
     digitalWrite(relayPin, state);
     EEPROM.write(getPowerStateAddress(), state);
     EEPROM.commit();
+    return true;
 }

@@ -64,7 +64,11 @@ void handleNewSettings()
   //Set the device power state
   if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_power_state")
   {
-    setPowerState(mqtt_message.toInt());
+    bool powerStateSet = setPowerState(mqtt_message.toInt());
+    if (powerStateSet == true)
+    {
+      publishMqttMessage("device/power_state_set", "{\"deviceId\":" + (String)getDeviceId() + ",\"powerState\":" + (String)getPowerState() + "}");
+    }
   }
 
   //Soft reset the device
@@ -122,6 +126,7 @@ void setup()
   Serial.print("DeviceID: ");
   Serial.println(getDeviceId());
 
+  // Endpoint to send network credentials in setup mode
   server.on(
       "/controller/setNetworkCredentials", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
       [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {

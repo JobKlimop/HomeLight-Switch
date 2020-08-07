@@ -97,6 +97,7 @@ void connectWiFi() {
     connectMqtt();
 }
 
+// Check if there is an SSID to connect to stored, if not start setup mode.
 void initConnection() {
     if(EEPROM.readString(getSsidAddress()).length() > 0) {
         connectWiFi();
@@ -136,4 +137,10 @@ boolean sendData(String endpoint, String message) {
     } else {
         return false;
     }
+}
+
+void publishMqttMessage(String topic, String message) {
+    char charBuf[message.length() + 1];
+    message.toCharArray(charBuf, message.length() + 1);
+    mqttClient.publish(topic.c_str(), charBuf);
 }
