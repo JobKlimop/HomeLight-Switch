@@ -12,14 +12,16 @@ String getGroupId() {
     return EEPROM.readString(getGroupIdAddress());
 }
 
-void setDeviceId(String id) {
+bool setDeviceId(String id) {
     EEPROM.writeString(getDeviceIdAddress(), id);
     EEPROM.commit();
+    return true;
 }
 
-void setDeviceName(String deviceName) {
+bool setDeviceName(String deviceName) {
     EEPROM.writeString(getDeviceNameAddress(), deviceName);
     EEPROM.commit();
+    return true;
 }
 
 void setGroup(String groupId) {

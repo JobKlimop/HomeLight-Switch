@@ -15,7 +15,7 @@ extern PubSubClient mqttClient;
 extern String mqtt_topic;
 extern String mqtt_message;
 extern boolean new_message;
-extern void sendMqttMessage(String, String);
+extern void publishMqttMessage(String, String);
 
 void initConnection();
 void reconnectMqtt();

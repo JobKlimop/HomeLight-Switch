@@ -45,20 +45,29 @@ void handleNewSettings()
   if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_device_id")
   {
     Serial.print("New device ID: ");
-    // Serial.println(mqtt_message.toInt());
-    setDeviceId(mqtt_message);
+    String previousId = getDeviceId();
+    bool isSet = setDeviceId(mqtt_message);
+    if(isSet == true) {
+      publishMqttMessage("device/device_id_set", "{\"deviceId\":" + (String)getDeviceId() + ",\"previousId\":" + previousId + "}");
+    }
   }
 
   //Set name of the device
   if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_device_name")
   {
-    setDeviceName(mqtt_message);
+    bool isSet = setDeviceName(mqtt_message);
+    if(isSet == true) {
+      publishMqttMessage("device/device_name_set", "{\"deviceId\":" + (String)getDeviceId() + ",\"deviceName\":" + mqtt_message + "}");
+    }
   }
 
   //Set group number the device is in
   if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_group_number")
   {
-    setGroup(mqtt_message);
+    bool isSet = setGroup(mqtt_message);
+    if(isSet == true) {
+      publishMqttMessage("device/device_group_set", "{\"deviceId\":" + (String)getDeviceId() + ",\"groupId\":" + mqtt_message + "}");
+    }
   }
 
   //Set the device power state
