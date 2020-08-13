@@ -35,12 +35,12 @@ void setLedMode(String mode) {
     }
 
     if(ledMode == "BLINK") {
-        Serial.print("ledMode: ");
-        Serial.println(ledMode);
-        Serial.print("ledActive: ");
-        Serial.println(ledActive);
-        Serial.print("ledTimer: ");
-        Serial.println(ledTimer);
+        // Serial.print("ledMode: ");
+        // Serial.println(ledMode);
+        // Serial.print("ledActive: ");
+        // Serial.println(ledActive);
+        // Serial.print("ledTimer: ");
+        // Serial.println(ledTimer);
         if(now - ledTimer > interval && ledActive == false) {
             ledTimer = now;
             ledActive = !ledActive;

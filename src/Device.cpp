@@ -24,9 +24,10 @@ bool setDeviceName(String deviceName) {
     return true;
 }
 
-void setGroup(String groupId) {
+bool setGroup(String groupId) {
     EEPROM.writeString(getGroupIdAddress(), groupId);
     EEPROM.commit();
+    return true;
 }
 
 void softResetDevice() {

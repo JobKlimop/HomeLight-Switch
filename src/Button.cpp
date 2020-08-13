@@ -9,6 +9,7 @@ boolean longButtonPressActive = false;
 
 void initButtonState() {
     pinMode(buttonPin, INPUT);
+    Serial.println("Button Init done");
 }
 
 int checkButtonPress() {
@@ -16,6 +17,7 @@ int checkButtonPress() {
         if(buttonActive == false) {
             buttonActive = true;
             buttonTimer = millis();
+            Serial.println("Button pressed");
         }
 
         if((millis() - buttonTimer > longButtonPressTime && (longButtonPressActive == false))) {
