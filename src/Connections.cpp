@@ -99,6 +99,8 @@ void connectWiFi() {
 
 // Check if there is an SSID to connect to stored, if not start setup mode.
 void initConnection() {
+    Serial.println(EEPROM.readString(getSsidAddress()).length());
+    Serial.println(EEPROM.readChar(getSsidAddress()));
     if(EEPROM.readString(getSsidAddress()).length() > 0) {
         connectWiFi();
     } 
