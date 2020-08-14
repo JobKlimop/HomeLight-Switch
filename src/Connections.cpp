@@ -74,11 +74,13 @@ void reconnectMqtt() {
 }
 
 void wifiSetup() {
+    Serial.println("wifiSetup()");
     WiFi.softAP(APSSID, APPASSWORD);
     Serial.println(WiFi.softAPIP());
 }
 
 void connectWiFi() {
+    Serial.println("connectWifi()");
     int connect_counter = 0;
 
     WiFi.begin(EEPROM.readString(getSsidAddress()).c_str(), EEPROM.readString(getPasswordAddress()).c_str());
@@ -98,14 +100,19 @@ void connectWiFi() {
 }
 
 // Check if there is an SSID to connect to stored, if not start setup mode.
-void initConnection() {
+String initConnection() {
+    Serial.print("Ssid size: ");
     Serial.println(EEPROM.readString(getSsidAddress()).length());
-    Serial.println(EEPROM.readChar(getSsidAddress()));
-    if(EEPROM.readString(getSsidAddress()).length() > 0) {
+    Serial.println(EEPROM.read(getSsidAddress()));
+    if(EEPROM.readString(getSsidAddress()).length() > 0 && EEPROM.readChar(getSsidAddress()) != -1) {
+        Serial.println("SSID found");
         connectWiFi();
+        return "connect";
     } 
     else {
+        Serial.println("SSID NOT FOUND");
         wifiSetup();
+        return "setup";
     }
 }
 

@@ -10,6 +10,7 @@
 #define EEPROM_SIZE 128
 #endif
 
+String connectionStatus = "";
 boolean messageAlreadySent = false;
 long messageTimer = 0;
 
@@ -20,7 +21,7 @@ void handleNewSettings()
   {
     if (mqtt_message == "search_device")
     {
-      String deviceJson = "{\"deviceId\":" + (String)getDeviceId() +
+      String deviceJson = "{\"_id\":" + (String)getDeviceId() +
                           ",\"deviceIp\":\"" + WiFi.localIP().toString() + "\"" +
                           ",\"deviceName\":\"" + (String)getDeviceName() + "\"" +
                           ",\"groupId\":" + (String)getGroupId() +
@@ -48,7 +49,7 @@ void handleNewSettings()
     String previousId = getDeviceId();
     bool isSet = setDeviceId(mqtt_message);
     if(isSet == true) {
-      publishMqttMessage("device/device_id_set", "{\"deviceId\":" + (String)getDeviceId() + ",\"previousId\":" + previousId + "}");
+      publishMqttMessage("device/device_id_set", "{\"_id\":" + (String)getDeviceId() + ",\"previousId\":" + previousId + "}");
     }
   }
 
@@ -57,7 +58,7 @@ void handleNewSettings()
   {
     bool isSet = setDeviceName(mqtt_message);
     if(isSet == true) {
-      publishMqttMessage("device/device_name_set", "{\"deviceId\":" + (String)getDeviceId() + ",\"deviceName\":" + mqtt_message + "}");
+      publishMqttMessage("device/device_name_set", "{\"_id\":" + (String)getDeviceId() + ",\"deviceName\":" + mqtt_message + "}");
     }
   }
 
@@ -66,7 +67,7 @@ void handleNewSettings()
   {
     bool isSet = setGroup(mqtt_message);
     if(isSet == true) {
-      publishMqttMessage("device/device_group_set", "{\"deviceId\":" + (String)getDeviceId() + ",\"groupId\":" + mqtt_message + "}");
+      publishMqttMessage("device/device_group_set", "{\"_id\":" + (String)getDeviceId() + ",\"groupId\":" + mqtt_message + "}");
     }
   }
 
@@ -76,7 +77,7 @@ void handleNewSettings()
     bool powerStateSet = setPowerState(mqtt_message.toInt());
     if (powerStateSet == true)
     {
-      publishMqttMessage("device/power_state_set", "{\"deviceId\":" + (String)getDeviceId() + ",\"powerState\":" + (String)getPowerState() + "}");
+      publishMqttMessage("device/power_state_set", "{\"_id\":" + (String)getDeviceId() + ",\"powerState\":" + (String)getPowerState() + "}");
     }
   }
 
@@ -128,8 +129,8 @@ void setup()
 
   initLight();
   setLedMode("BLINK");
+  connectionStatus = initConnection();
   initPowerState();
-  initConnection();
   initButtonState();
 
   Serial.print("DeviceID: ");
@@ -145,9 +146,11 @@ void setup()
         String ssidString = doc["SSID"];
         String passwordString = doc["PASSWORD"];
 
-        EEPROM.writeString(getSsidAddress(), ssidString);
-        EEPROM.writeString(getPasswordAddress(), passwordString);
-        EEPROM.commit();
+        setSsid(ssidString);
+        setPassword(passwordString);
+        // EEPROM.writeString(getSsidAddress(), ssidString);
+        // EEPROM.writeString(getPasswordAddress(), passwordString);
+        // EEPROM.commit();
 
         delay(10000);
         ESP.restart();
@@ -165,8 +168,8 @@ void loop()
   }
   else if (pressMode == 2)
   {
-    Serial.println("{\"deviceId\":\"" + (String)getDeviceId() + "\"}");
-    boolean messageReceived = sendData("/deleteDevice", "{\"deviceId\":\"" + (String)getDeviceId() + "\"}");
+    Serial.println("{\"_id\":\"" + (String)getDeviceId() + "\"}");
+    boolean messageReceived = sendData("/deleteDevice", "{\"_id\":\"" + (String)getDeviceId() + "\"}");
 
     if (messageReceived == true)
     {
@@ -190,12 +193,12 @@ void loop()
     else
     {
       setLedMode("OFF");
-      if (getDeviceId() == 0)
+      if (getDeviceId() == "0")
       {
         if (messageAlreadySent == false)
         {
-          String deviceJson = "{\"deviceId\":" + (String)getDeviceId() +
-                              ",\"deviceIp\":\"" + WiFi.localIP() + "\"" +
+          String deviceJson = "{\"_id\":" + (String)getDeviceId() +
+                              ",\"deviceIp\":\"" + WiFi.localIP().toString() + "\"" +
                               ",\"deviceName\":\"" + (String)getDeviceName() + "\"" +
                               ",\"groupId\":" + (String)getGroupId() +
                               ",\"powerState\":" + (String)getPowerState() +
@@ -230,7 +233,7 @@ void loop()
 
     mqttClient.loop();
   }
-  else
+  else if (WiFi.status() != WL_CONNECTED && connectionStatus == "connect")
   {
     setLedMode("BLINK");
     initConnection();

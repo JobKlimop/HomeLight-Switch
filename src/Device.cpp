@@ -1,4 +1,5 @@
 #include <Device.hpp>
+#include <Memory.hpp>
 
 String getDeviceId() {
     return EEPROM.readString(getDeviceIdAddress());
@@ -39,21 +40,22 @@ void softResetDevice() {
 }
 
 void hardResetDevice() {
-    int i = 13;
-    int j = 42;
+    int ssidAddress = getSsidAddress();
+    int passwordAddress = getPasswordAddress();
     setDeviceId("0");
     setDeviceName("");
     setGroup("0");
     EEPROM.write(getPowerStateAddress(), LOW);
-    while(EEPROM.read(i) != 0x00) {
-        EEPROM.write(i, 0x00);
-        i++;
+    while(EEPROM.read(ssidAddress) != 0x00 && ssidAddress < passwordAddress) {
+        EEPROM.write(ssidAddress, 0x00);
+        ssidAddress++;
     }
-    while(EEPROM.read(j) != 0x00) {
-        EEPROM.write(j, 0x00);
-        j++;
+    while(EEPROM.read(passwordAddress) != 0x00) {
+        EEPROM.write(passwordAddress, 0x00);
+        passwordAddress++;
     }
     EEPROM.commit();
+    delay(250);
 
     ESP.restart();
 }

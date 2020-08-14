@@ -17,7 +17,7 @@ extern String mqtt_message;
 extern boolean new_message;
 extern void publishMqttMessage(String, String);
 
-void initConnection();
+String initConnection();
 void reconnectMqtt();
 DynamicJsonDocument parseData(AsyncWebServerRequest *request, uint8_t *data, size_t jsonCapacity, String endpoint);
 boolean sendData(String endpoint, String message);

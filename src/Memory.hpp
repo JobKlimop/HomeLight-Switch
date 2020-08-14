@@ -7,3 +7,5 @@ int getGroupIdAddress();
 int getDeviceNameAddress();
 int getSsidAddress();
 int getPasswordAddress();
+void setSsid(String);
+void setPassword(String);
