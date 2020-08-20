@@ -19,7 +19,7 @@ void handleNewSettings()
   //All topics
   if (mqtt_topic == "all/")
   {
-    if (mqtt_message == "search_device")
+    if (mqtt_message == "search_device" && new_message == true)
     {
       String deviceJson = "{\"_id\":" + (String)getDeviceId() +
                           ",\"deviceIp\":\"" + WiFi.localIP().toString() + "\"" +
@@ -28,11 +28,15 @@ void handleNewSettings()
                           ",\"powerState\":" + (String)getPowerState() +
                           "}";
 
+      Serial.println("JSON: " + deviceJson);
       boolean messageReceived = sendData("/addNewDevice", deviceJson);
+      Serial.print("messageReceived: ");
+      Serial.println(messageReceived);
 
-      if (messageReceived == true)
+      if (messageReceived == 1)
       {
-        Serial.println("Message received");
+        Serial.println("Message received1");
+        new_message = false;
       }
       else
       {
@@ -43,79 +47,155 @@ void handleNewSettings()
 
   //Device topics
   //Set the device ID
-  if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_device_id")
+  if (mqtt_topic == "device/set_device_id")
   {
-    Serial.print("New device ID: ");
-    String previousId = getDeviceId();
-    bool isSet = setDeviceId(mqtt_message);
-    if(isSet == true) {
-      publishMqttMessage("device/device_id_set", "{\"_id\":" + (String)getDeviceId() + ",\"previousId\":" + previousId + "}");
+    const size_t jsonCapacity = JSON_OBJECT_SIZE(2) + 80;
+    DynamicJsonDocument doc(jsonCapacity);
+    deserializeJson(doc, mqtt_message);
+    String previous_id = doc["previous_id"];
+    String _id = doc["_id"];
+
+    Serial.println("Previous_id: " + previous_id);
+    Serial.println("_id: " + _id);
+
+    Serial.println("DeviceID: " + (String)getDeviceId());
+    if ((String)getDeviceId() == (String)previous_id)
+    {
+      bool isSet = setDeviceId(_id);
+      if (isSet == true)
+      {
+        publishMqttMessage("device/device_id_set", "{\"_id\":\"" + (String)getDeviceId() + "\" ,\"previousId\":\"" + previous_id + "\"}");
+      }
     }
   }
 
   //Set name of the device
-  if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_device_name")
+  if (mqtt_topic == "device/set_device_name")
   {
-    bool isSet = setDeviceName(mqtt_message);
-    if(isSet == true) {
-      publishMqttMessage("device/device_name_set", "{\"_id\":" + (String)getDeviceId() + ",\"deviceName\":" + mqtt_message + "}");
+    const size_t jsonCapacity = JSON_OBJECT_SIZE(2) + 80;
+    DynamicJsonDocument doc(jsonCapacity);
+    deserializeJson(doc, mqtt_message);
+    String _id = doc["_id"];
+    String deviceName = doc["deviceName"];
+
+    if ((String)getDeviceId() == (String)_id)
+    {
+      bool isSet = setDeviceName(deviceName);
+      if (isSet == true)
+      {
+        publishMqttMessage("device/device_name_set", "{\"_id\":\"" + (String)getDeviceId() + "\",\"deviceName\":\"" + deviceName + "\"}");
+      }
     }
   }
 
   //Set group number the device is in
-  if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_group_number")
+  if (mqtt_topic == "device/set_group_number")
   {
-    bool isSet = setGroup(mqtt_message);
-    if(isSet == true) {
-      publishMqttMessage("device/device_group_set", "{\"_id\":" + (String)getDeviceId() + ",\"groupId\":" + mqtt_message + "}");
+    const size_t jsonCapacity = JSON_OBJECT_SIZE(2) + 80;
+    DynamicJsonDocument doc(jsonCapacity);
+    deserializeJson(doc, mqtt_message);
+    String _id = doc["_id"];
+    String groupId = doc["groupId"];
+
+    if ((String)getDeviceId() == (String)_id)
+    {
+      bool isSet = setGroup(groupId);
+      if (isSet == true)
+      {
+        publishMqttMessage("device/device_group_set", "{\"_id\":\"" + (String)getDeviceId() + "\",\"groupId\":\"" + groupId + "\"}");
+      }
     }
   }
 
   //Set the device power state
-  if (mqtt_topic == "device/" + (String)getDeviceId() + "/set_power_state")
+  if (mqtt_topic == "device/set_power_state")
   {
-    bool powerStateSet = setPowerState(mqtt_message.toInt());
-    if (powerStateSet == true)
+    const size_t jsonCapacity = JSON_OBJECT_SIZE(2) + 80;
+    DynamicJsonDocument doc(jsonCapacity);
+    deserializeJson(doc, mqtt_message);
+    String _id = doc["_id"];
+    String powerState = doc["powerState"];
+
+    if ((String)getDeviceId() == (String)_id)
     {
-      publishMqttMessage("device/power_state_set", "{\"_id\":" + (String)getDeviceId() + ",\"powerState\":" + (String)getPowerState() + "}");
+      bool powerStateSet = setPowerState(powerState.toInt());
+      if (powerStateSet == true)
+      {
+        publishMqttMessage("device/power_state_set", "{\"_id\":\"" + (String)getDeviceId() + "\",\"powerState\":\"" + (String)getPowerState() + "\"}");
+      }
     }
   }
 
   //Soft reset the device
-  if (mqtt_topic == "device/" + (String)getDeviceId() + "/reset_device")
+  if (mqtt_topic == "device/reset_device")
   {
-    if (mqtt_message == "true")
+    const size_t jsonCapacity = JSON_OBJECT_SIZE(2) + 80;
+    DynamicJsonDocument doc(jsonCapacity);
+    deserializeJson(doc, mqtt_message);
+    String _id = doc["_id"];
+    String soft_reset = doc["soft_reset"];
+
+    if ((String)getDeviceId() == (String)_id)
     {
-      softResetDevice();
+      if (soft_reset == "true")
+      {
+        softResetDevice();
+      }
     }
   }
 
   //Hard reset the device, which will delete all stored data
-  if (mqtt_topic == "device/" + (String)getDeviceId() + "/hard_reset_device")
+  if (mqtt_topic == "device/hard_reset_device")
   {
-    if (mqtt_message == "true")
+    const size_t jsonCapacity = JSON_OBJECT_SIZE(2) + 80;
+    DynamicJsonDocument doc(jsonCapacity);
+    deserializeJson(doc, mqtt_message);
+    String _id = doc["_id"];
+    String hard_reset = doc["hard_reset"];
+
+    if ((String)getDeviceId() == (String)_id)
     {
-      hardResetDevice();
+      if (hard_reset == "true")
+      {
+        hardResetDevice();
+      }
     }
   }
 
   //Restart the device
-  if (mqtt_topic == "device/" + (String)getDeviceId() + "/restart_device")
+  if (mqtt_topic == "device/restart_device")
   {
-    if (mqtt_message == "true")
+    const size_t jsonCapacity = JSON_OBJECT_SIZE(2) + 80;
+    DynamicJsonDocument doc(jsonCapacity);
+    deserializeJson(doc, mqtt_message);
+    String _id = doc["_id"];
+    String restart = doc["restart"];
+
+    if ((String)getDeviceId() == (String)_id)
     {
-      restartDevice();
+      if (restart == "true")
+      {
+        restartDevice();
+      }
     }
   }
 
   //Group topics
   //Sets powerstate for all devices within group
-  if (mqtt_topic == "group/" + (String)getGroupId() + "/set_power_state")
+  if (mqtt_topic == "group/set_power_state")
   {
-    setPowerState(mqtt_message.toInt());
-  }
+    const size_t jsonCapacity = JSON_OBJECT_SIZE(2) + 80;
+    DynamicJsonDocument doc(jsonCapacity);
+    deserializeJson(doc, mqtt_message);
+    String groupId = doc["groupId"];
+    String powerState = doc["restart"];
 
-  new_message = false;
+    if ((String)getGroupId() == (String)groupId)
+    {
+      setPowerState(powerState.toInt());
+      new_message = false;
+    } 
+  }
 }
 
 void setup()
@@ -173,7 +253,7 @@ void loop()
 
     if (messageReceived == true)
     {
-      Serial.println("Message received");
+      Serial.println("Message received2");
       delay(500);
       hardResetDevice();
     }
@@ -208,7 +288,7 @@ void loop()
 
           if (messageReceived == true)
           {
-            Serial.println("Message received");
+            Serial.println("Message received3");
           }
           else
           {

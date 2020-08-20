@@ -4,8 +4,8 @@ const int deviceIdAddress = 0; //24 characters
 const int powerStateAddress = 25; //1 character
 const int groupIdAddress = 26; 
 const int deviceNameAddress = 27; 
-const int ssidAddress = 37;
-const int passwordAddress = 66;
+const int ssidAddress = 50;
+const int passwordAddress = 80;
 
 int getDeviceIdAddress() {
     return deviceIdAddress;

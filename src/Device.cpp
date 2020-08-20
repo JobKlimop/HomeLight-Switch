@@ -31,6 +31,44 @@ bool setGroup(String groupId) {
     return true;
 }
 
+void resetDeviceId() {
+    int deviceIdAddress = getDeviceIdAddress();
+    while(EEPROM.read(deviceIdAddress) != 0x00 && deviceIdAddress < getPowerStateAddress()) {
+        EEPROM.write(deviceIdAddress, 0x00);
+        deviceIdAddress++;
+    }
+    EEPROM.commit();
+    setDeviceId("0");
+}
+
+void resetDeviceName() {
+    int deviceNameAddress = getDeviceNameAddress();
+    while(EEPROM.read(deviceNameAddress) != 0x00 && deviceNameAddress < getSsidAddress()) {
+        EEPROM.write(deviceNameAddress, 0x00);
+        deviceNameAddress++;
+    }
+    EEPROM.commit();
+}
+
+void resetSsid() {
+    int ssidAddress = getSsidAddress();
+
+    while(EEPROM.read(ssidAddress) != 0x00 && ssidAddress < getPasswordAddress()) {
+        EEPROM.write(ssidAddress, 0x00);
+        ssidAddress++;
+    }
+    EEPROM.commit();
+}
+
+void resetPassword() {
+    int passwordAddress = getPasswordAddress();
+    while(EEPROM.read(passwordAddress) != 0x00) {
+        EEPROM.write(passwordAddress, 0x00);
+        passwordAddress++;
+    }
+    EEPROM.commit();
+}
+
 void softResetDevice() {
     setDeviceName("");
     setGroup("0");
@@ -40,20 +78,13 @@ void softResetDevice() {
 }
 
 void hardResetDevice() {
-    int ssidAddress = getSsidAddress();
-    int passwordAddress = getPasswordAddress();
-    setDeviceId("0");
-    setDeviceName("");
+    resetDeviceId();
+    resetDeviceName();
     setGroup("0");
     EEPROM.write(getPowerStateAddress(), LOW);
-    while(EEPROM.read(ssidAddress) != 0x00 && ssidAddress < passwordAddress) {
-        EEPROM.write(ssidAddress, 0x00);
-        ssidAddress++;
-    }
-    while(EEPROM.read(passwordAddress) != 0x00) {
-        EEPROM.write(passwordAddress, 0x00);
-        passwordAddress++;
-    }
+    resetSsid();
+    resetPassword();
+
     EEPROM.commit();
     delay(250);
 

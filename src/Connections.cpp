@@ -20,8 +20,8 @@ HTTPClient httpClient;
 
 void setSubscriptions() {
     String all_topic = "all/#";
-    String device_topic = "device/" + EEPROM.readString(getDeviceIdAddress()) + "/#";
-    String group_topic = "group/" + (String)EEPROM.read(getGroupIdAddress()) + "/#";
+    String device_topic = "device/#";
+    String group_topic = "group/#";
 
     mqttClient.subscribe(all_topic.c_str());
     mqttClient.subscribe(device_topic.c_str());
@@ -116,7 +116,7 @@ String initConnection() {
     }
 }
 
-DynamicJsonDocument parseData(AsyncWebServerRequest *request, uint8_t *data, size_t jsonCapacity, String endpoint) {
+DynamicJsonDocument parseData(AsyncWebServerRequest *request, uint8_t *data, size_t jsonCapacity, String endpoint = "") {
     DynamicJsonDocument doc(jsonCapacity);
     DeserializationError err = deserializeJson(doc, data);
     Serial.println(serializeJsonPretty(doc, Serial));
